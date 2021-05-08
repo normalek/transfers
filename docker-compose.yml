@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  app:
+    image: 'transfers:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    network_mode: bridge
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    links:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/transfers
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    network_mode: bridge
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=transfers
+
+volumes:
+  postgres-data:
